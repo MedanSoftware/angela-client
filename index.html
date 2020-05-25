@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Angela Client Testing</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">	
+</head>
+<body>
+<div class="container">
+	<table class="table table-hover table-striped table-bordered" style="margin-top:4%;">
+		<tbody id="table-info"></tbody>
+	</table>
+</div>
+</body>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript" src="assets/dist/Angela.bundle.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var permission = Angela.Load.helper('permission');
+	permission.register_push_notification(push => {
+		console.log(push)
+		$('#table-info').append('<tr><td>Push Notification</td><td>'+JSON.stringify(push)+'</td></tr>');
+	});
+
+	// $('#form_push').on('submit',(function(){
+	// 	$.ajax({
+	// 		url: 'http://localhost:8081/online/webpush',
+	// 		type: 'POST',
+	// 		dataType: 'json',
+	// 		data: {param1: 'value1'},
+	// 	});
+		
+	// }));
+
+	// var io = 
+
+	var Cookie = Angela.Load.helper('Cookie');
+	var Identification = Angela.Load.helper('Identification');
+
+	$('#table-info')
+		.append('<tr><td>Environment</td><td>'+Angela.Helpers.App.environment()+'</td></tr>')
+		.append('<tr><td>Site Path</td><td>'+Angela.Helpers.App.site_path()+'</td></tr>')
+		.append('<tr><td>Cookie</td><td>'+JSON.stringify(Cookie.all())+'</td></tr>')
+		.append('<tr><td>Is Mobile</td><td>'+Identification.is_mobile()+'</td></tr>');
+
+	Identification.get_device_id(device_id => {
+		$('#table-info').append('<tr><td>Device ID</td><td>'+device_id+'</td></tr>');
+	});
+
+	Identification.get_browser_id(browser_id => {
+		$('#table-info').append('<tr><td>Browser ID</td><td>'+browser_id+'</td></tr>');
+	});
+
+	Identification.get_device_type(device_type => {
+		$('#table-info').append('<tr><td>Device Type</td><td>'+device_type+'</td></tr>');
+	});
+
+	Identification.get_device_info(device_info => {
+		$('#table-info').append('<tr><td>Device Info</td><td>'+JSON.stringify(device_info)+'</td></tr>');
+	});
+
+	Identification.get_local_ip(local_ip => {
+		$('#table-info').append('<tr><td>Local IP</td><td>'+local_ip+'</td></tr>');
+	});
+
+	Identification.get_public_ip(public_ip => {
+		$('#table-info').append('<tr><td>Public IP</td><td>'+public_ip+'</td></tr>');
+	});
+
+	Identification.get_ip_location(location => {
+		$('#table-info').append('<tr><td>Location</td><td>'+JSON.stringify(location)+'</td></tr>');
+	});
+
+	// var peer = new PeerJs;
+	// peer.on('open', function(id){
+	// 	console.log('My peer ID is: ' + id);
+	// });
+	// var conn = peer.connect('another-peers-id');
+	// on open will be launch when you successfully connect to PeerServer
+	// conn.on('open', function(){
+	// 	console.log('x')
+	// // here you have conn.id
+	// conn.send('hi!');
+	// });
+
+	// peer.on('connection', function(conn) {
+	// 	console.log('con')
+	// 	conn.on('data', function(data){
+	// 	// Will print 'hi!'
+	// 	console.log(data);
+	// 	});
+	// });
+});
+</script>
+</html>
