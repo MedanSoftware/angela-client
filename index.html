@@ -19,25 +19,13 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script type="text/javascript" src="assets/dist/Angela.bundle.js"></script>
+<script src="http://localhost:8081/AngelaSocketio/socket.io.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	var permission = Angela.Load.helper('permission');
 	permission.register_push_notification(push => {
-		console.log(push)
 		$('#table-info').append('<tr><td>Push Notification</td><td>'+JSON.stringify(push)+'</td></tr>');
 	});
-
-	// $('#form_push').on('submit',(function(){
-	// 	$.ajax({
-	// 		url: 'http://localhost:8081/online/webpush',
-	// 		type: 'POST',
-	// 		dataType: 'json',
-	// 		data: {param1: 'value1'},
-	// 	});
-		
-	// }));
-
-	// var io = 
 
 	var Cookie = Angela.Load.helper('Cookie');
 	var Identification = Angela.Load.helper('Identification');
@@ -76,25 +64,21 @@ $(document).ready(function() {
 		$('#table-info').append('<tr><td>Location</td><td>'+JSON.stringify(location)+'</td></tr>');
 	});
 
-	// var peer = new PeerJs;
-	// peer.on('open', function(id){
-	// 	console.log('My peer ID is: ' + id);
-	// });
-	// var conn = peer.connect('another-peers-id');
-	// on open will be launch when you successfully connect to PeerServer
-	// conn.on('open', function(){
-	// 	console.log('x')
-	// // here you have conn.id
-	// conn.send('hi!');
-	// });
+	var AngelaString = Angela.Load.helper('String');
+	var AngelaPeerJs = new Angela.Libraries.Peer('localhost', 8081, 'AngelaPeerJs');
+	AngelaPeerJs.connect(AngelaString.random_string(6), peer => {
+		$('#table-info').append('<tr><td>PeerJS ID</td><td>'+peer.id+'</td></tr>');
+	});
 
-	// peer.on('connection', function(conn) {
-	// 	console.log('con')
-	// 	conn.on('data', function(data){
-	// 	// Will print 'hi!'
-	// 	console.log(data);
-	// 	});
-	// });
+	var socket = io('localhost:8081', {
+		path : 'AngelaSocketio',
+		transports : ['websocket', 'polling']
+	});
+
+	socket.on('connect', () => {
+		console.log('socketio connected');
+	});
 });
 </script>
+
 </html>

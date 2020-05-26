@@ -50,9 +50,9 @@ exports.register_push_notification = function(callback) {
 				}
 
 				async function run() {
-					const serviceWorkerFile = URL_.base_url('service-worker.js');
+					const serviceWorkerFile = URL_.base_url('assets/dist/service-worker.js');
 					const register = await navigator.serviceWorker.register(serviceWorkerFile, {
-						scope: App_.site_path()
+						scope: App_.site_path()+'assets/dist/'
 					});
 
 					register.addEventListener('updatefound',() => {

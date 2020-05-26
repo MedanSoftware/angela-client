@@ -3,6 +3,7 @@ var path = require('path');
 var CompressionPlugin = require('compression-webpack-plugin');
 var CopyPlugin = require('copy-webpack-plugin');
 var CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
+var ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 
 module.exports = (env = 'development', arg) => {
 
@@ -10,7 +11,11 @@ module.exports = (env = 'development', arg) => {
 		target: 'web',
 		mode: env,
 		plugins: [
-			new CleanWebpackPlugin()
+			new CleanWebpackPlugin(),
+			new ServiceWorkerWebpackPlugin({
+				entry: path.join(__dirname, 'src/service-worker.js'),
+				filename: 'service-worker.js'
+			})
 		],
 		optimization: {
 			minimizer: [],

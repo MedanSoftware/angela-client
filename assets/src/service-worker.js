@@ -7,9 +7,14 @@
  * @author Agung Dirgantara <agungmasda29@gmail.com>
  * 
  * Refrence : 
- * - https://developer.mozilla.org/en-US/docs/Web/API/notification (Notification API)
- * - https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope (Service Worker Global Scope)
- * - https://developers.google.com/web/updates/2015/05/notifying-you-of-changes-to-notifications
+ * 
+ * - https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers (using service worker)
+ * - https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope (service worker global scope)
+ * - https://developer.mozilla.org/en-US/docs/Web/API/notification (notification)
+ * 
+ * - https://developers.google.com/web/fundamentals/primers/service-workers (web fundamentals - service worker)
+ * - https://developers.google.com/web/updates/2015/05/notifying-you-of-changes-to-notifications#serviceworkerregistrationgetnotifications (change notification)
+ * - https://firebase.google.com/docs/reference/admin/node/admin.messaging.WebpushNotification
  */
 
 'use strict';
@@ -21,7 +26,6 @@ let app = {
 }
 
 async function postData(url = '', data = {}) {
-	// Default options are marked with *
 	const response = await fetch(url, {
 		method: 'POST', // *GET, POST, PUT, DELETE, etc.
 		mode: 'cors', // no-cors, *cors, same-origin
@@ -45,7 +49,7 @@ async function postData(url = '', data = {}) {
  * @param  {String} event
  */
 self.addEventListener('install', event => {
-	console.log('installing '+app.name+' Service Worker Version : '+app.version);
+	console.log('Installing '+app.name+' Service Worker v-'+app.version);
 	self.skipWaiting();
 });
 
@@ -72,16 +76,8 @@ self.addEventListener('push', function(event) {
 	var message = data.message || "Here's something you might want to check out.";
 	var icon = "images/new-notification.png";
 
-	var notificationPromise = self.registration.showNotification(data.notification.title, {
-		body : 'Hello body',
-		icon : 'https://www.pinclipart.com/picdir/big/452-4527480_shield-badge-free-png-image-bronze-package-clipart.png',
-		badge : 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Brimob_badge.png/1200px-Brimob_badge.png',
-		tag : 'tagged',
-		data : {
-			x : 'aw'
-		},
-		dir : 'ltr'
-	});
+	var notificationPromise = self.registration.showNotification(data.notification.title, data.notification);
+
 	event.waitUntil(notificationPromise);
 });
 
