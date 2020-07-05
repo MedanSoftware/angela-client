@@ -1,11 +1,7 @@
 import App_ from '../helpers/App';
-import PeerJs from 'peerjs-client';
+import io from 'socket.io-client';
 
-/**
- * PeerJs Client
- */
-export default class Peer {
-
+export default class Socketio {
 	constructor(host, port, path){
 		this.host = host;
 		this.port = port;
@@ -43,13 +39,10 @@ export default class Peer {
 		return this;
 	}
 
-	/**
-	 * Connect to server
-	 * 
-	 * @param  {String}   id
-	 * @param  {Function} callback
-	 */
-	connect(id, callback) {
-		App_.callback(callback, PeerJs(id, {host : this.host, port : this.port, path : this.path}));
+	connect(callback) {
+		App_.callback(callback, io(this.host+':'+this.port, {
+			path: this.path,
+			transports : ['websocket']
+		}));
 	}
 }

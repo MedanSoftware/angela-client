@@ -3,10 +3,10 @@
 <head>
 	<title>Angela Client Testing</title>
 	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/bootstrap-3.4.1/css/bootstrap.min.css">
 
 	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">	
+	<link rel="stylesheet" href="assets/bootstrap-3.4.1/css/bootstrap-theme.min.css">	
 </head>
 <body>
 <div class="container">
@@ -15,11 +15,11 @@
 	</table>
 </div>
 </body>
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="assets/javascript/jquery/jquery-3.5.1.min.js"></script>
 <!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="assets/dist/Angela.bundle.js"></script>
-<script src="http://localhost:8081/AngelaSocketio/socket.io.js"></script>
+<script src="https://angela-server.herokuapp.com/AngelaSocketio/socket.io.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	var permission = Angela.Load.helper('permission');
@@ -64,20 +64,31 @@ $(document).ready(function() {
 		$('#table-info').append('<tr><td>Location</td><td>'+JSON.stringify(location)+'</td></tr>');
 	});
 
+	Identification.is_private_browser().then(is_private => {
+		$('#table-info').append('<tr><td>Is Private Browser</td><td>'+is_private+'</td></tr>');
+	});
+
 	var AngelaString = Angela.Load.helper('String');
-	var AngelaPeerJs = new Angela.Libraries.Peer('localhost', 8081, 'AngelaPeerJs');
-	AngelaPeerJs.connect(AngelaString.random_string(6), peer => {
-		$('#table-info').append('<tr><td>PeerJS ID</td><td>'+peer.id+'</td></tr>');
+	// var AngelaPeerJs = new Angela.Libraries.Peer('localhost', 8081, 'AngelaPeerJs');
+	// AngelaPeerJs.connect(AngelaString.random_string(6), peer => {
+	// 	$('#table-info').append('<tr><td>PeerJS ID</td><td>'+peer.id+'</td></tr>');
+	// });
+
+
+	var socket = new Angela.Libraries.Socketio('https://angela-server.herokuapp.com', 443, '/AngelaSocketio');
+	socket.connect(data => {
+		console.log(data)
 	});
 
-	var socket = io('localhost:8081', {
-		path : 'AngelaSocketio',
-		transports : ['websocket', 'polling']
-	});
+	// socket.on('connect', (data) => {
+	// 	console.log(data)
+	// 	console.log('socketio connected');
+	// });
 
-	socket.on('connect', () => {
-		console.log('socketio connected');
-	});
+	// socket.on('from_server', data => {
+	// 	console.log(data);
+	// })
+
 });
 </script>
 

@@ -21,7 +21,7 @@ exports.is_mobile = () => {
  * @param  {Function} callback
  * @return {String}
  */
-exports.get_device_id = function(callback) {
+exports.get_device_id = callback => {
 	let identify = {
 		platform : navigator.platform,
 		canvas : CryptoJS.SHA1(get_canvas_fingerprint({dontUseFakeFontInCanvas:true}).toString()).toString(),
@@ -37,7 +37,7 @@ exports.get_device_id = function(callback) {
  * @param  {Function} callback
  * @return {String}
  */
-exports.get_device_type = (callback) => {
+exports.get_device_type = callback => {
 	if (typeof navigator.getBattery == 'function') {
 		navigator.getBattery().then(function(battery) {
 			if (battery.charging && battery.chargingTime === 0) {
@@ -57,41 +57,42 @@ exports.get_device_type = (callback) => {
  * @param  {Function} callback
  * @return {Object}
  */
-exports.get_device_info = function(callback) {
+exports.get_device_info = callback => {
 	var _this = this;
 	async function get_info() {
 		let data = {};
-		let device_id = new Promise((resolve,reject) => { 
+		let device_id = new Promise((resolve, reject) => { 
 			_this.get_device_id(value => {
 				resolve(value);
 			});
 		});
 
-		let device_type = new Promise((resolve,reject) => { 
+		let device_type = new Promise((resolve, reject) => { 
 			_this.get_device_type(value => {
 				resolve(value);
 			});
 		});
 
-		let is_private = new Promise((resolve,reject) => { 
-			_this.is_private_browser(value => {
-				resolve(value);
+		let is_private = new Promise((resolve, reject) => { 
+			_this.is_private_browser().then(is_private => {
+				resolve(is_private);
 			});
 		});
 
-		let browser_id = new Promise((resolve,reject) => { 
+		let browser_id = new Promise((resolve, reject) => { 
 			_this.get_browser_id(value => {
+				console.log(value)
 				resolve(value);
 			});
 		});
 
-		let public_ip = new Promise((resolve,reject) => { 
+		let public_ip = new Promise((resolve, reject) => { 
 			_this.get_public_ip(value => {
 				resolve(value);
 			});
 		});
 
-		let coordinate = new Promise((resolve,reject) => { 
+		let coordinate = new Promise((resolve, reject) => { 
 			_this.get_coordinate(value => {
 				resolve(value);
 			});
@@ -132,6 +133,8 @@ exports.get_device_info = function(callback) {
 
 	get_info().then(data => {
 		App_.callback(callback, data);
+	}, error => {
+		console.log(error)
 	});
 }
 
@@ -141,13 +144,14 @@ exports.get_device_info = function(callback) {
  * @param  {Function} callback
  * @return {String}
  */
-exports.get_browser_id = function(callback) {
+exports.get_browser_id = callback => {
+
 	var _this = this;
 	var options = {
 		extraComponents : [
 			{
 				key : 'device_id',
-				getData : (done,options) => {
+				getData : (done, options) => {
 					_this.get_device_id(data => {
 						done(data);
 					});
@@ -155,26 +159,26 @@ exports.get_browser_id = function(callback) {
 			},
 			{
 				key : 'device_model',
-				getData : (done,options) => {
+				getData : (done, options) => {
 					done($.ua.device.model)
 				}
 			},
 			{
 				key : 'device_vendor',
-				getData : (done,options) => {
+				getData : (done, options) => {
 					done($.ua.device.vendor)
 				}
 			},
 			{
 				key : 'canvas_fingerprint',
-				getData : (done,options) => {
+				getData : (done, options) => {
 					done(CryptoJS.SHA1(get_canvas_fingerprint({ dontUseFakeFontInCanvas:true }).toString()).toString());
 				}
 			},
 			{
 				key : 'is_private_browser',
-				getData : (done,options) => {
-					_this.is_private_browser(data => {
+				getData : (done, options) => {
+					_this.is_private_browser().then(data => {
 						done(data);
 					});
 				}
@@ -182,9 +186,9 @@ exports.get_browser_id = function(callback) {
 		]
 	}
 
-	FingerPrintJs2.get(options,(components) => {
+	FingerPrintJs2.get(options, components => {
 		var hash = CryptoJS.SHA1(JSON.stringify(components)).toString();
-    	App_.callback(callback,hash);
+    	App_.callback(callback, hash);
 	});
 }
 
@@ -212,11 +216,11 @@ exports.get_browser_info = () => {
  * @param  {Function}
  * @return {Object}
  */
-exports.get_coordinate = function(callback) {
+exports.get_coordinate = callback => {
 	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition((position) => { App_.callback(callback, Array_.clone_as_object(position.coords))},(error => {
+		navigator.geolocation.getCurrentPosition(position => { App_.callback(callback, Array_.clone_as_object(position.coords))},(error => {
 			if (error) {
-				App_.callback(callback,error);
+				App_.callback(callback, error);
 			}
 		}),{
 			enableHighAccuracy: true,
@@ -232,7 +236,7 @@ exports.get_coordinate = function(callback) {
  * @param  {Function} callback
  * @return {String}
  */
-exports.get_local_ip = function(callback) {
+exports.get_local_ip = callback => {
 	window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 	var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};
 	pc.createDataChannel('');
@@ -241,9 +245,9 @@ exports.get_local_ip = function(callback) {
 		if (ice && ice.candidate && ice.candidate.candidate) {
 			var local_ip = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate);
 			pc.onicecandidate = noop;
-			App_.callback(callback,(local_ip !== null)?local_ip[1]:'none');
+			App_.callback(callback,(local_ip !== null)?local_ip[1]:'-');
 		} else {
-			App_.callback(callback,'none');
+			App_.callback(callback,'-');
 		}
 	}
 }
@@ -255,7 +259,7 @@ exports.get_local_ip = function(callback) {
  * @param  {String}   source
  * @return {String}
  */
-exports.get_public_ip = function(callback, source) {
+exports.get_public_ip = (callback, source) => {
 	if (navigator.onLine) {
 		switch (source) {
 			case 'seeip':
@@ -282,8 +286,7 @@ exports.get_public_ip = function(callback, source) {
 				});
 			break;
 		}
-	}
-	else {
+	} else {
 		App_.callback(callback,'offline');
 	}
 }
@@ -345,60 +348,88 @@ exports.is_canvas_supported = () => {
  * @param  {Function} callback
  * @return {Boolean}
  */
-exports.is_private_browser = function(callback) {
-	var is_private;
+exports.is_private_browser = async function(callback) {
+	var is_private = false;
 
-	if (window.webkitRequestFileSystem) {
-		window.webkitRequestFileSystem(window.TEMPORARY, 1,function() {
+	return new Promise(async function(resolve, reject) { 
+
+		if ('storage' in navigator && 'estimate' in navigator.storage) {
+			const {usage, quota} = await navigator.storage.estimate();
+			if (quota < 120000000) {
+				is_private = true;
+			} else {
+				is_private = false;
+			}
+
+			resolve(is_private);
+		} else if (window.webkitRequestFileSystem) {
+			window.webkitRequestFileSystem(window.TEMPORARY, 1,function() {
+				is_private = false;
+			},function(e) {
+				is_private = true;
+			});
+
+			resolve(is_private);
+		} else if (is_IE10_or_later(window.navigator.userAgent)) {
 			is_private = false;
-		},function(e) {
-			is_private = true;
-		});
-	} else if (window.indexedDB && /Firefox/.test(window.navigator.userAgent)) {
-		var db;
-		try {
-			db = window.indexedDB.open('test');
-		} catch (e) {
-			is_private = true;
-		}
-
-		if (typeof is_private === 'undefined') {
-			retry_check_private_browser(
-				function isDone() {
-					return db.readyState === 'done' ? true : false;
-				}, function next(is_timeout) {
-					if (!is_timeout) {
-						is_private = db.result ? false : true;
-					}
-				});
-		}
-	} else if (is_IE10_or_later(window.navigator.userAgent)) {
-		is_private = false;
-		try {
-			if (!window.indexedDB) {
+			try {
+				if (!window.indexedDB) {
+					is_private = true;
+				}
+			} catch (e) {
 				is_private = true;
 			}
-		} catch (e) {
-			is_private = true;
-		}
-	} else if (window.localStorage && /Safari/.test(window.navigator.userAgent)) {
-		try {
-			window.localStorage.setItem('test', 1);
-		} catch (e) {
-			is_private = true;
+
+			resolve(is_private);
+		} else if (window.localStorage && /Safari/.test(window.navigator.userAgent)) {
+			try {
+				window.localStorage.setItem('test', 1);
+			} catch (e) {
+				is_private = true;
+			}
+
+			if (typeof is_private === 'undefined') {
+				is_private = false;
+				window.localStorage.removeItem('test');
+			}
+
+			resolve(is_private);
+		} else if (window.webkitRequestFileSystem) {
+			window.webkitRequestFileSystem(window.TEMPORARY, 1,function() {
+				is_private = false;
+			},function(e) {
+				is_private = true;
+			});
+
+			resolve(is_private);
+		} else {
+			if (window.indexedDB && /Firefox/.test(window.navigator.userAgent)) {
+				var db;
+				try {
+					db = window.indexedDB.open('test');
+				} catch (e) {
+					is_private = true;
+				}
+
+				if (typeof is_private === 'undefined') {
+					retry_check_private_browser(
+						function isDone() {
+							return db.readyState === 'done' ? true : false;
+						}, function next(is_timeout) {
+							if (!is_timeout) {
+								is_private = db.result ? false : true;
+							}
+						});
+				}
+
+				resolve(is_private);
+			}
 		}
 
-		if (typeof is_private === 'undefined') {
-			is_private = false;
-			window.localStorage.removeItem('test');
-		}
-	}
-
-	retry_check_private_browser(function isDone() {
-		return typeof is_private !== 'undefined' ? true : false;
-	}, function next(is_timeout) {
-		App_.callback(callback,is_private)
+		resolve(is_private);
 	});
+
+	
 }
 
 /**

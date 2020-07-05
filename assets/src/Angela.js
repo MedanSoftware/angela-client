@@ -9,6 +9,8 @@ import Swal from 'sweetalert2';
 
 import Peer from './libraries/Peer';
 
+import Socketio from './libraries/Socketio';
+
 import DataTable from './libraries/DataTable';
 
 import Encryption from './libraries/Encryption';
@@ -18,6 +20,7 @@ import Encryption from './libraries/Encryption';
  */
 window.Swal = Swal;
 window.PeerJs = require('peerjs-client');
+window.Socketio = require('socket.io-client');
 
 var Load = {
 	helper : function (name) {
@@ -131,6 +134,6 @@ var Load = {
 
 var Helpers = Load.helper(['App', 'Cookie', 'URL']);
 
-var Libraries = { DataTable, Encryption, Peer };
+var Libraries = { DataTable, Encryption, Peer, Socketio };
 
 export default { Helpers, Libraries, Load }
