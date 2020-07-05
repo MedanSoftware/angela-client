@@ -74,21 +74,12 @@ $(document).ready(function() {
 	// 	$('#table-info').append('<tr><td>PeerJS ID</td><td>'+peer.id+'</td></tr>');
 	// });
 
-
 	var socket = new Angela.Libraries.Socketio('https://angela-server.herokuapp.com', 443, '/AngelaSocketio');
-	socket.connect(data => {
-		console.log(data)
+	socket.connect(socket => {
+		socket.on('connect', () => {
+			$('#table-info').append('<tr><td>Socket.io ID</td><td>'+socket.id+'</td></tr>');
+		})
 	});
-
-	// socket.on('connect', (data) => {
-	// 	console.log(data)
-	// 	console.log('socketio connected');
-	// });
-
-	// socket.on('from_server', data => {
-	// 	console.log(data);
-	// })
-
 });
 </script>
 
