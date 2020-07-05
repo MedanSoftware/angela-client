@@ -81,7 +81,6 @@ exports.get_device_info = callback => {
 
 		let browser_id = new Promise((resolve, reject) => { 
 			_this.get_browser_id(value => {
-				console.log(value)
 				resolve(value);
 			});
 		});
